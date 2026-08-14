@@ -353,25 +353,21 @@ const GROUPS = [{"group": "Morning Affirmations", "icon": "🌅", "sessions": [{
 // ── R2 AUDIO ──────────────────────────────────────────────────────────────────
 var R2 = 'https://pub-50722e14177044aea768641dae886cce.r2.dev';
 var AUDIO_URLS = [
-  // 0: Morning Affirmations
   ['affirmations_audio/01_I_Am_More_Than_My_Diagnosis.mp3',
    'affirmations_audio/02_My_Body_Is_Doing_Its_Best.mp3',
    'affirmations_audio/03_Today_I_Choose_Courage.mp3',
    'affirmations_audio/04_I_Am_A_Warrior_Not_A_Patient.mp3',
    'affirmations_audio/05_This_Breath_This_Moment_This_Life.mp3'],
-  // 1: Night Gratitude
   ['gratitude_audio/01_Three_Things_My_Body_Did_Today.mp3',
    'gratitude_audio/02_I_Showed_Up_That_Is_Enough.mp3',
    'gratitude_audio/03_Releasing_The_Fear_I_Carried_Today.mp3',
    'gratitude_audio/04_Gratitude_For_The_People_Who_Held_Me.mp3',
    'gratitude_audio/05_Gentle_Surrender_Into_Rest.mp3'],
-  // 2: Breath Awareness
   ['breath_audio/01_Pursed_Lip_Breathing_Your_Anchor.mp3',
    'breath_audio/02_Belly_Breathing_Slow_And_Gentle.mp3',
    'breath_audio/03_Breath_As_Your_Home.mp3',
    'breath_audio/04_The_Breathing_Body_Scan.mp3',
    'breath_audio/05_Every_Exhale_Is_A_Release.mp3'],
-  // 3: Anxiety & Fear
   ['anxiety_audio/01_Fear_Of_Hospital_Visits.mp3',
    'anxiety_audio/02_Fear_Of_Breathlessness_In_Public.mp3',
    'anxiety_audio/03_Fear_Of_Speaking_In_Meetings.mp3',
@@ -379,140 +375,534 @@ var AUDIO_URLS = [
    'anxiety_audio/05_Fear_Of_Being_A_Burden.mp3',
    'anxiety_audio/06_The_Oxygen_Alarm.mp3',
    'anxiety_audio/07_When_They_Say_You_Look_Fine.mp3'],
-  // 4: Overthinking
   ['overthinking_audio/01_The_Thought_Observer.mp3',
    'overthinking_audio/02_Clouds_In_The_Sky_Thoughts_Pass.mp3',
    'overthinking_audio/03_Body_Scan_To_Exit_The_Mind_Spiral.mp3',
    'overthinking_audio/04_This_Thought_Is_Not_A_Fact.mp3',
    'overthinking_audio/05_The_Quiet_Space_Between_Thoughts.mp3'],
-  // 5: Motivation
   ['motivation_audio/01_You_Came_This_Far.mp3',
    'motivation_audio/02_Small_Victories_Are_Real_Victories.mp3',
    'motivation_audio/03_Living_Fully_Not_Just_Surviving.mp3',
    'motivation_audio/04_Your_Story_Is_Someone_Else_s_Strength.mp3',
    'motivation_audio/05_The_Warrior_Who_Chose_Life_Today.mp3'],
-  // 6: Social Courage — audio coming soon
   [null,null,null,null,null],
-  // 7: Self-Compassion & Rest — audio coming soon
   [null,null,null,null,null],
-  // 8: Advanced Deep Meditation
   ['Advanced%20meditation_audio/01_Deep_Acceptance_This_Is_My_Life_And_It_Is_Beautiful.mp3',
    'Advanced%20meditation_audio/02_Surrendering_The_Fear_Of_Tomorrow.mp3',
    'Advanced%20meditation_audio/03_Finding_Meaning_Beyond_The_Illness.mp3',
    'Advanced%20meditation_audio/04_Loving_Every_Part_Of_This_Body.mp3',
    'Advanced%20meditation_audio/05_The_Warrior_Who_Chose_Life_Every_Single_Day.mp3'],
-  // 9: Low Energy Mode
   ['low_energy_audio/01_Just_One_Breath.mp3',
    'low_energy_audio/02_Rest_Is_Enough.mp3',
    'low_energy_audio/03_Hospital_Waiting_Room_Calm.mp3',
    'low_energy_audio/04_I_Don_t_Need_To_Be_Productive_Today.mp3',
    'low_energy_audio/05_Five_Minutes_Of_Peace.mp3'],
 ];
-
-function getAudioUrl(gi, si) {
-  if (!AUDIO_URLS[gi] || AUDIO_URLS[gi][si] == null) return null;
-  return R2 + '/' + AUDIO_URLS[gi][si];
+function getAudioUrl(gi,si){
+  if(!AUDIO_URLS[gi]||AUDIO_URLS[gi][si]==null)return null;
+  return R2+'/'+AUDIO_URLS[gi][si];
 }
-
-var _audioEl = null;
-function getAudioEl() {
-  if (!_audioEl) {
-    _audioEl = document.getElementById('sessAudio');
-    _audioEl.addEventListener('timeupdate', function() {
-      if (!_audioEl.duration) return;
-      var cur = Math.floor(_audioEl.currentTime);
-      var tot = Math.floor(_audioEl.duration);
-      var m = Math.floor(cur/60), s = cur%60;
-      var mt = Math.floor(tot/60), st = tot%60;
-      var pt = document.getElementById('pTimer');
-      if (pt) pt.textContent = m+':'+(s<10?'0':'')+s;
-      var bar = document.getElementById('seekBar');
-      if (bar && !bar._seeking) bar.value = Math.floor((_audioEl.currentTime/_audioEl.duration)*100);
-      var dur = document.getElementById('audioDuration');
-      if (dur) dur.textContent = mt+':'+(st<10?'0':'')+st;
+var _audioEl=null;
+function getAudioEl(){
+  if(!_audioEl){
+    _audioEl=document.getElementById('sessAudio');
+    _audioEl.addEventListener('timeupdate',function(){
+      if(!_audioEl.duration)return;
+      var cur=Math.floor(_audioEl.currentTime),tot=Math.floor(_audioEl.duration);
+      var m=Math.floor(cur/60),s=cur%60,mt=Math.floor(tot/60),st=tot%60;
+      var pt=document.getElementById('pTimer');
+      if(pt)pt.textContent=m+':'+(s<10?'0':'')+s;
+      var bar=document.getElementById('seekBar');
+      if(bar&&!bar._seeking)bar.value=Math.floor((_audioEl.currentTime/_audioEl.duration)*100);
+      var dur=document.getElementById('audioDuration');
+      if(dur)dur.textContent=mt+':'+(st<10?'0':'')+st;
     });
-    _audioEl.addEventListener('ended', finishSession);
-    _audioEl.addEventListener('canplay', function() {
-      var ct = document.getElementById('circleText');
-      if (ct && ct.textContent === '...') ct.textContent = '\u266a';
+    _audioEl.addEventListener('ended',finishSession);
+    _audioEl.addEventListener('canplay',function(){
+      var ct=document.getElementById('circleText');
+      if(ct&&ct.textContent==='...')ct.textContent='\u266a';
     });
   }
   return _audioEl;
 }
+function seekTo(val){var a=getAudioEl();if(a.duration)a.currentTime=(val/100)*a.duration;}
+// ── END R2 AUDIO ──────────────────────────────────────────────────────────────
 
-function togglePlay() {
-  if (!isPlaying) startPlaying();
-  else if (isPaused) resumePlaying();
+const QUOTES = [
+  "You came this far. That matters more than you know.",
+  "Rest is medicine, and you are allowed to take it.",
+  "Your breath is your anchor. It is always with you.",
+  "Small victories are real victories. Every single one.",
+  "You belong in every room you enter.",
+  "The clouds will pass. The sky remains.",
+  "One breath at a time is enough.",
+  "You are more than your survival."
+];
+
+var PARA_GAP=1800, COMMA_GAP=500, BREATH_IN_GAP=4000, BELLY_OUT_GAP=7000, PURSED_OUT_GAP=8000, SENT_GAP=600;
+
+var curG=0, curS=0, isPlaying=false, isPaused=false;
+var speakQueue=[], speakIndex=0, pauseTO=null, timerInterval=null, elapsed=0;
+var voiceCache=null, wakeLock=null;
+
+function store(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }
+function load(k,d){ try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;} }
+var progress = load('phwm_progress', {done:{}, minutes:0, lastDay:'', streak:0, lastG:null, lastS:null});
+var favs = load('phwm_favs', {});
+var reviews = load('phwm_reviews', {});
+
+// playback functions defined above
+
+
+
+function ssCancel(){var a=document.getElementById('sessAudio');if(a)a.pause();}
+function ssPause(){var a=document.getElementById('sessAudio');if(a)a.pause();}
+function ssResume(){var a=document.getElementById('sessAudio');if(a)a.play();}catch(e){} }
+
+// ── CUE PARSER — handles ALL cue label variants (BUG FIX for "b r e a t h e") ──
+function parseCue(p){
+  // returns {kind:'in'|'belly'|'pursed'|null, text}
+  var m = p.match(/^([A-Z_]+):\s*/);
+  if(!m) return {kind:null, text:p};
+  var label=m[1], rest=p.slice(m[0].length);
+  if(label==='BREATH_IN') return {kind:'in', text:rest};
+  if(label==='BREATH_PURSED_OUT') return {kind:'pursed', text:rest};
+  if(label==='BREATH_BELLY_OUT'||label==='BREATH_OUT') return {kind:'belly', text:rest};
+  // Unknown label — strip it anyway so TTS never spells it out
+  return {kind:null, text:rest};
+}
+
+function splitAtCommas(text){
+  var parts=text.split(/,\s*/), result=[], buffer='';
+  parts.forEach(function(part){
+    part=part.trim(); if(!part)return;
+    if(buffer){
+      if(buffer.split(/\s+/).length<3) buffer=buffer+' '+part;
+      else { result.push(buffer); buffer=part; }
+    } else buffer=part;
+  });
+  if(buffer)result.push(buffer);
+  return result;
+}
+function buildQueue(sess){
+  var q=[];
+  sess.paragraphs.forEach(function(p, pi){
+    if(pi < sess.introCount) return; // Skip intro completely
+    var isIntro = false;
+    var cue = parseCue(p);
+    var isIN = cue.kind==='in', isBO = cue.kind==='belly', isPO = cue.kind==='pursed';
+    var rate=isIN?0.60:(isPO||isBO)?0.50:0.68;
+    var pitch=isIN?0.88:(isPO||isBO)?0.80:0.93;
+    var parts=cue.text.split('...');
+    parts.forEach(function(part,pj){
+      part=part.trim(); if(!part)return;
+      var chunks=splitAtCommas(part);
+      chunks.forEach(function(chunk,ci){
+        chunk=chunk.trim(); if(!chunk)return;
+        q.push({type:'speak', text:chunk, rate:rate, pitch:pitch, intro:isIntro, breath:isIN?'in':(isBO||isPO)?'out':null});
+        if(ci<chunks.length-1)q.push({type:'pause', ms:COMMA_GAP, intro:isIntro});
+      });
+      if(pj<parts.length-1)q.push({type:'pause', ms:900, intro:isIntro});
+    });
+    if(isIN)q.push({type:'pause', ms:BREATH_IN_GAP, intro:isIntro});
+    else if(isBO)q.push({type:'pause', ms:BELLY_OUT_GAP, intro:isIntro});
+    else if(isPO)q.push({type:'pause', ms:PURSED_OUT_GAP, intro:isIntro});
+    else q.push({type:'pause', ms:PARA_GAP, intro:isIntro});
+    q.push({type:'pause', ms:SENT_GAP, intro:isIntro});
+  });
+  return q;
+}
+
+function speakNext(){
+  if(!isPlaying||isPaused)return;
+  if(speakIndex>=speakQueue.length){ finishSession(); return; }
+  var seg=speakQueue[speakIndex]; speakIndex++;
+  updateSkipIntroBtn();
+  if(seg.type==='pause'){
+    if(seg.ms>0)pauseTO=setTimeout(speakNext,seg.ms); else speakNext();
+  }else{
+    animateBreath(seg.breath);
+    var utt=new SpeechSynthesisUtterance(seg.text);
+    utt.rate=seg.rate||0.68; utt.pitch=seg.pitch||0.93; utt.volume=1;
+    var v=getVoice(); if(v)utt.voice=v;
+    utt.onend=function(){ if(isPlaying&&!isPaused)speakNext(); };
+    utt.onerror=function(){ if(isPlaying&&!isPaused)speakNext(); };
+    try{ window.speechSynthesis.speak(utt); }catch(e){ speakNext(); }
+  }
+}
+function animateBreath(breath){
+  var c=document.getElementById('breathCircle');
+  var t=document.getElementById('circleText');
+  if(!c)return;
+  if(breath==='in'){ c.className='breath-circle inhale'; if(t)t.textContent='breathe in'; }
+  else if(breath==='out'){ c.className='breath-circle exhale'; if(t)t.textContent='breathe out'; }
+  else { c.className='breath-circle'; if(t)t.textContent=''; }
+}
+function updateSkipIntroBtn(){
+  var btn=document.getElementById('skipIntroBtn'); if(!btn)return;
+  var inIntro = isPlaying && speakIndex<speakQueue.length && speakQueue[Math.max(0,speakIndex-1)] && speakQueue[Math.max(0,speakIndex-1)].intro;
+  btn.className = inIntro ? 'skip-intro show' : 'skip-intro';
+}
+function skipIntro(){
+  if(!speakQueue.length)return;
+  ssCancel(); clearTimeout(pauseTO);
+  var i=speakIndex;
+  while(i<speakQueue.length && speakQueue[i].intro) i++;
+  speakIndex=i;
+  document.getElementById('skipIntroBtn').className='skip-intro';
+  if(isPlaying&&!isPaused)speakNext();
+}
+
+function togglePlay(){
+  if(!window.speechSynthesis){ alert('Speech not supported in this browser'); return; }
+  if(!isPlaying)startPlaying();
+  else if(isPaused)resumePlaying();
   else pausePlaying();
 }
-function startPlaying() {
-  var url = getAudioUrl(curG, curS);
-  var a = getAudioEl();
-  if (!url) {
-    var ct = document.getElementById('circleText');
-    if (ct) ct.textContent = 'coming soon';
-    alert('Audio for this session is coming soon. The script is available in the Script tab.');
-    return;
-  }
-  if (a.src !== url) { a.src = url; a.currentTime = 0; }
-  a.play().catch(function(e){ console.log('play error',e); });
-  isPlaying = true; isPaused = false;
-  document.getElementById('playBtn').textContent = '\u23f8';
-  var ct = document.getElementById('circleText'); if (ct) ct.textContent = '...';
-  requestWL();
-  progress.lastG = curG; progress.lastS = curS;
-  store('phwm_progress', progress);
+function startPlaying(){
+  ssCancel();
+  var sess=GROUPS[curG].sessions[curS];
+  speakQueue=buildQueue(sess); speakIndex=0; elapsed=0;
+  isPlaying=true; isPaused=false;
+  document.getElementById('playBtn').textContent='⏸';
+  startTimer(); requestWL();
+  progress.lastG=curG; progress.lastS=curS; store('phwm_progress',progress);
+  pauseTO=setTimeout(speakNext,600);
 }
-function pausePlaying() {
-  getAudioEl().pause();
-  isPaused = true; releaseWL();
-  document.getElementById('playBtn').textContent = '\u25b6';
+function pausePlaying(){
+  isPaused=true; ssPause(); clearTimeout(pauseTO); clearInterval(timerInterval); releaseWL();
+  document.getElementById('playBtn').textContent='▶';
 }
-function resumePlaying() {
-  getAudioEl().play();
-  isPaused = false; requestWL();
-  document.getElementById('playBtn').textContent = '\u23f8';
+function resumePlaying(){
+  isPaused=false; ssResume(); requestWL();
+  document.getElementById('playBtn').textContent='⏸';
+  startTimer(); speakNext();
 }
-function stopSession() {
-  var a = document.getElementById('sessAudio');
-  if (a) { a.pause(); a.removeAttribute('src'); a.load(); }
-  isPlaying = false; isPaused = false; elapsed = 0;
-  clearInterval(timerInterval); releaseWL();
-  var pb = document.getElementById('playBtn'); if (pb) pb.textContent = '\u25b6';
-  var pt = document.getElementById('pTimer'); if (pt) pt.textContent = '0:00';
-  var bar = document.getElementById('seekBar'); if (bar) bar.value = 0;
-  var dur = document.getElementById('audioDuration'); if (dur) dur.textContent = '';
+function stopSession(){
+  ssCancel(); clearTimeout(pauseTO); clearInterval(timerInterval); releaseWL();
+  isPlaying=false; isPaused=false; elapsed=0; speakIndex=0; speakQueue=[];
+  var pb=document.getElementById('playBtn'); if(pb)pb.textContent='▶';
+  var pt=document.getElementById('pTimer'); if(pt)pt.textContent='0:00';
+  var sk=document.getElementById('skipIntroBtn'); if(sk)sk.className='skip-intro';
   animateBreath(null);
-  var t = document.getElementById('circleText'); if (t) t.textContent = 'ready';
+  var t=document.getElementById('circleText'); if(t)t.textContent='ready';
 }
-function finishSession() {
+function finishSession(){
   markDone(); stopSession();
-  var t = document.getElementById('circleText'); if (t) t.textContent = 'complete \ud83d\ude4f';
-  var cb = document.getElementById('autoNextCheck');
-  if (cb && cb.checked) { setTimeout(function(){ if(!isPlaying) nextSessionAuto(); }, 1500); }
+  var t=document.getElementById('circleText'); if(t)t.textContent='complete 🙏';
+  var cb=document.getElementById('autoNextCheck');
+  if(cb&&cb.checked){ setTimeout(function(){ if(!isPlaying)nextSessionAuto(); },1500); }
 }
-function replaySession() {
-  var a = getAudioEl();
-  a.currentTime = 0; a.play();
-  isPlaying = true; isPaused = false;
-  document.getElementById('playBtn').textContent = '\u23f8';
+function replaySession(){ stopSession(); startPlaying(); }
+function skipForward(){
+  if(!speakQueue.length)return;
+  ssCancel(); clearTimeout(pauseTO);
+  speakIndex=Math.min(speakQueue.length-1, speakIndex+3); elapsed+=10;
+  if(isPlaying&&!isPaused)speakNext();
 }
-function skipForward() {
-  var a = getAudioEl();
-  if (a.readyState) a.currentTime = Math.min(a.duration||0, a.currentTime + 10);
+function skipBack(){
+  if(!speakQueue.length)return;
+  ssCancel(); clearTimeout(pauseTO);
+  speakIndex=Math.max(0, speakIndex-3); elapsed=Math.max(0,elapsed-10);
+  if(isPlaying&&!isPaused)speakNext();
 }
-function skipBack() {
-  var a = getAudioEl();
-  if (a.readyState) a.currentTime = Math.max(0, a.currentTime - 10);
+function prevSession(){ if(curS>0){ stopSession(); openPlayer(curG,curS-1);} }
+function nextSessionBtn(){ if(curS<GROUPS[curG].sessions.length-1){ stopSession(); openPlayer(curG,curS+1);} }
+function nextSessionAuto(){
+  if(curS<GROUPS[curG].sessions.length-1){ openPlayer(curG,curS+1); startPlaying(); }
 }
-function seekTo(val) {
-  var a = getAudioEl();
-  if (a.duration) { a.currentTime = (val/100) * a.duration; }
+function startTimer(){
+  clearInterval(timerInterval);
+  timerInterval=setInterval(function(){
+    elapsed++;
+    var m=Math.floor(elapsed/60), s=elapsed%60;
+    var pt=document.getElementById('pTimer'); if(pt)pt.textContent=m+':'+(s<10?'0':'')+s;
+  },1000);
 }
-function startTimer() {}       // driven by audio timeupdate
-function skipIntro() {}        // n/a for MP3
-function updateSkipIntroBtn(){}// n/a for MP3
+function requestWL(){
+  try{ if('wakeLock' in navigator){ navigator.wakeLock.request('screen').then(function(wl){wakeLock=wl;}).catch(function(){}); } }catch(e){}
+}
+function releaseWL(){ try{ if(wakeLock){wakeLock.release();wakeLock=null;} }catch(e){} }
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='visible'&&isPlaying&&!isPaused)requestWL();
+});
 
+function markDone(){
+  var key=curG+'-'+curS;
+  progress.done[key]=true;
+  var mins=parseInt(GROUPS[curG].sessions[curS].duration)||12;
+  progress.minutes+=mins;
+  var today=new Date().toDateString();
+  if(progress.lastDay!==today){
+    var yest=new Date(); yest.setDate(yest.getDate()-1);
+    progress.streak=(progress.lastDay===yest.toDateString())?progress.streak+1:1;
+    progress.lastDay=today;
+  }
+  store('phwm_progress',progress);
+  updateStats();
+}
+function updateStats(){
+  var n=Object.keys(progress.done).length;
+  ['statSessions','jSessions'].forEach(function(id){var e=document.getElementById(id);if(e)e.textContent=n;});
+  ['statStreak','jStreak'].forEach(function(id){var e=document.getElementById(id);if(e)e.textContent=progress.streak;});
+  ['statMinutes','jMinutes'].forEach(function(id){var e=document.getElementById(id);if(e)e.textContent=progress.minutes;});
+  var jr=document.getElementById('jReviewed'); if(jr)jr.textContent=Object.keys(reviews).length;
+}
+
+// ── NAV / RENDER ──
+function showView(id){
+  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  document.getElementById('navHome').className='nav-btn'+(id==='viewHome'?' on':'');
+  document.getElementById('navJourney').className='nav-btn'+(id==='viewJourney'?' on':'');
+}
+function navTo(id){
+  if(id==='viewJourney')renderJourney();
+  if(id==='viewHome')renderHome();
+  showView(id);
+}
+function heroTap(){
+  if(progress.lastG!==null&&GROUPS[progress.lastG]){ openPlayer(progress.lastG, progress.lastS||0); }
+  else { openPlayer(0,0); }
+}
+function sosTap(){
+  // Emergency calm: Breath Awareness session 1 until Group 16 is scripted
+  openPlayer(2,0); startPlaying();
+}
+function openGroup(gi){
+  curG=gi;
+  var g=GROUPS[gi];
+  document.getElementById('groupTitle').textContent=g.icon+' '+g.group;
+  document.getElementById('sessionList').innerHTML=g.sessions.map(function(s,si){
+    var key=gi+'-'+si;
+    var done=progress.done[key]?'<span class="done-tick">✓</span> ':'';
+    var rev=reviews[key];
+    var badge=rev?(rev.status==='approved'?'<span class="badge ok">APPROVED</span>':rev.status==='needs'?'<span class="badge needs">NEEDS CHANGES</span>':''):'';
+    var faved=favs[key]?'faved':'';
+    return '<div class="sess-item">'+
+      '<div class="sess-num" style="background:linear-gradient(135deg,'+g.c1+','+g.c2+');" onclick="openPlayer('+gi+','+si+')">'+(si+1)+'</div>'+
+      '<div class="sess-info" onclick="openPlayer('+gi+','+si+')">'+
+        '<div class="sess-name">'+done+s.title+'</div>'+
+        '<div class="sess-meta">'+s.duration+' '+badge+'</div>'+
+      '</div>'+
+      '<button class="fav-btn '+faved+'" onclick="toggleFav(event,'+gi+','+si+')">♥</button>'+
+    '</div>';
+  }).join('');
+  showView('viewGroup');
+}
+function toggleFav(ev,gi,si){
+  ev.stopPropagation();
+  var key=gi+'-'+si;
+  if(favs[key])delete favs[key]; else favs[key]=true;
+  store('phwm_favs',favs);
+  openGroup(gi);
+}
+function openPlayer(gi,si){
+  stopSession();
+  curG=gi; curS=si;
+  var g=GROUPS[gi], s=g.sessions[si];
+  document.getElementById('pGroup').textContent=g.group;
+  document.getElementById('pTitle').textContent=s.title;
+  renderScript(); loadRev();
+  pTab('play');
+  showView('viewPlayer');
+}
+function exitPlayer(){ stopSession(); openGroup(curG); }
+
+// ── PLAYER TABS ──
+function pTab(which){
+  ['play','script','review'].forEach(function(t){
+    document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).className='ptab'+(t===which?' on':'');
+    document.getElementById('body'+t.charAt(0).toUpperCase()+t.slice(1)).className='ptab-body'+(t===which?' on':'');
+  });
+}
+function renderScript(){
+  var s=GROUPS[curG].sessions[curS];
+  var htmlParts=[];
+  s.paragraphs.forEach(function(p,pi){
+    var isIntro=pi<s.introCount;
+    var cue=parseCue(p);
+    var cls='script-p'+(cue.kind?' cue':'')+(isIntro?' intro-p':'');
+    var prefix=cue.kind==='in'?'🌬 IN — ':cue.kind==='belly'?'🌬 OUT — ':cue.kind==='pursed'?'🌬 PURSED OUT — ':'';
+    htmlParts.push('<div class="'+cls+'">'+prefix+cue.text+'</div>');
+    if(isIntro&&pi===s.introCount-1)htmlParts.push('<div class="intro-divider">— session begins —</div>');
+  });
+  document.getElementById('scriptBox').innerHTML=htmlParts.join('');
+}
+
+// ── REVIEW ──
+function revKey(){ return curG+'-'+curS; }
+function loadRev(){
+  var r=reviews[revKey()]||{};
+  document.getElementById('revNote').value=r.note||'';
+  document.getElementById('revOk').className='rev-btn'+(r.status==='approved'?' ok-on':'');
+  document.getElementById('revNeeds').className='rev-btn'+(r.status==='needs'?' needs-on':'');
+  document.getElementById('revMsg').textContent='';
+}
+function setRev(status){
+  var r=reviews[revKey()]||{};
+  r.status=(r.status===status)?null:status;
+  reviews[revKey()]=r; store('phwm_reviews',reviews);
+  loadRev();
+  document.getElementById('revMsg').textContent='Status saved';
+}
+function saveRev(){
+  var r=reviews[revKey()]||{};
+  r.note=document.getElementById('revNote').value;
+  reviews[revKey()]=r; store('phwm_reviews',reviews);
+  document.getElementById('revMsg').textContent='✓ Review saved';
+  updateStats();
+}
+function exportAll(){
+  var out='PH WARRIOR MIND — FULL APP FEEDBACK\n===================================\n\n';
+  GROUPS.forEach(function(g,gi){
+    var lines=[];
+    g.sessions.forEach(function(s,si){
+      var r=reviews[gi+'-'+si];
+      if(r&&(r.status||r.note)){
+        lines.push('  S'+(si+1)+' — '+s.title+'\n    Status: '+(r.status||'—')+'\n    Notes: '+(r.note||'—'));
+      }
+    });
+    if(lines.length){ out+=g.group+'\n'+lines.join('\n')+'\n\n'; }
+  });
+  if(out.indexOf('S')<0) out+='(no feedback recorded yet)';
+  var ov=document.getElementById('exportOverlay');
+  document.getElementById('expArea').value=out;
+  ov.className='show';
+  try{ document.getElementById('expArea').select(); document.execCommand('copy'); }catch(e){}
+}
+
+// ── JOURNEY ──
+function renderJourney(){
+  updateStats();
+  var list=[];
+  GROUPS.forEach(function(g,gi){
+    g.sessions.forEach(function(s,si){
+      if(favs[gi+'-'+si]){
+        list.push('<div class="sess-item" onclick="openPlayer('+gi+','+si+')">'+
+          '<div class="sess-num" style="background:linear-gradient(135deg,'+g.c1+','+g.c2+');">'+g.icon+'</div>'+
+          '<div class="sess-info"><div class="sess-name">'+s.title+'</div>'+
+          '<div class="sess-meta">'+g.group+'</div></div></div>');
+      }
+    });
+  });
+  document.getElementById('favList').innerHTML=list.length?list.join(''):'<div class="fav-empty">Tap ♥ on any session to save it here</div>';
+}
+
+// ── HOME ──
+function renderHome(){
+  var h=new Date().getHours();
+  var g=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  document.getElementById('greeting').innerHTML=g+', <b>warrior</b>';
+  var day=Math.floor(Date.now()/86400000);
+  document.getElementById('dailyQuote').textContent='"'+QUOTES[day%QUOTES.length]+'"';
+  var hg,hs,label;
+  if(progress.lastG!==null&&GROUPS[progress.lastG]){
+    hg=progress.lastG; hs=progress.lastS||0; label='Continue where you left off';
+  } else {
+    hg=day%GROUPS.length; hs=day%GROUPS[hg].sessions.length; label="Today's Session";
+  }
+  document.getElementById('heroLabel').textContent=label;
+  document.getElementById('heroTitle').textContent=GROUPS[hg].sessions[hs].title;
+  document.getElementById('heroSub').textContent=GROUPS[hg].icon+' '+GROUPS[hg].group+' · '+GROUPS[hg].sessions[hs].duration;
+  document.getElementById('groupGrid').innerHTML=GROUPS.map(function(g,gi){
+    return '<div class="tile" style="background:linear-gradient(150deg,'+g.c1+'CC,'+g.c2+'E6);" onclick="openGroup('+gi+')">'+
+      '<div class="tile-emoji">'+g.icon+'</div>'+
+      '<div><div class="tile-name">'+g.group+'</div>'+
+      '<div class="tile-count">'+g.sessions.length+' sessions</div></div></div>';
+  }).join('');
+  updateStats();
+}
+
+/* ── VOICE SELECTOR ── */
+var voiceList = [];
+var selectedVoiceURI = '';
+
+function loadVoices(){}
+function setVoice(uri){}
+
+/* ── BACKGROUND MUSIC ── */
+var musicCtx = null;
+var musicNodes = { gain: null, osc1: null, osc2: null, osc3: null };
+var musicOn = false;
+
+function initMusic() {
+  if (musicCtx) return;
+  try {
+    musicCtx = new (window.AudioContext || window.webkitAudioContext)();
+    musicNodes.gain = musicCtx.createGain();
+    musicNodes.gain.gain.value = 0;
+    musicNodes.gain.connect(musicCtx.destination);
+    // Ambient drone — three detuned sine waves
+    [110, 110.3, 220.15].forEach(function(freq, i) {
+      var osc = musicCtx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      var g = musicCtx.createGain();
+      g.gain.value = i === 2 ? 0.06 : 0.12;
+      osc.connect(g);
+      g.connect(musicNodes.gain);
+      osc.start();
+    });
+    // Soft high shimmer
+    var osc4 = musicCtx.createOscillator();
+    osc4.type = 'sine';
+    osc4.frequency.value = 528;
+    var g4 = musicCtx.createGain();
+    g4.gain.value = 0.03;
+    osc4.connect(g4);
+    g4.connect(musicNodes.gain);
+    osc4.start();
+  } catch(e) {}
+}
+
+function toggleMusic() {
+  initMusic();
+  musicOn = !musicOn;
+  var btn = document.getElementById('musicToggle');
+  var vol = document.getElementById('musicVol');
+  if (musicOn) {
+    btn.classList.add('on');
+    vol.classList.add('active');
+    if (musicCtx && musicCtx.state === 'suspended') musicCtx.resume();
+    if (musicNodes.gain) {
+      musicNodes.gain.gain.cancelScheduledValues(musicCtx.currentTime);
+      musicNodes.gain.gain.linearRampToValueAtTime(getMusicGain(), musicCtx.currentTime + 2);
+    }
+  } else {
+    btn.classList.remove('on');
+    vol.classList.remove('active');
+    if (musicNodes.gain && musicCtx) {
+      musicNodes.gain.gain.cancelScheduledValues(musicCtx.currentTime);
+      musicNodes.gain.gain.linearRampToValueAtTime(0, musicCtx.currentTime + 1.5);
+    }
+  }
+}
+
+function getMusicGain() {
+  var v = document.getElementById('musicVol');
+  return v ? (parseFloat(v.value) / 100) * 0.4 : 0.12;
+}
+
+function setMusicVol(val) {
+  if (musicNodes.gain && musicCtx && musicOn) {
+    musicNodes.gain.gain.cancelScheduledValues(musicCtx.currentTime);
+    musicNodes.gain.gain.linearRampToValueAtTime((val / 100) * 0.4, musicCtx.currentTime + 0.3);
+  }
+}
+
+function stopMusic() {
+  if (musicNodes.gain && musicCtx && musicOn) {
+    musicNodes.gain.gain.cancelScheduledValues(musicCtx.currentTime);
+    musicNodes.gain.gain.linearRampToValueAtTime(0, musicCtx.currentTime + 2);
+  }
+}
+
+
+function init(){
+  renderHome();
+}
 init();
 </script>
 <audio id="sessAudio" preload="auto"></audio>
