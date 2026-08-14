@@ -284,6 +284,11 @@
       <button class="pc-btn" onclick="skipForward()">10 ⏩</button>
     </div>
     <div class="audio-controls">
+      <div class="audio-row">
+        <span class="audio-label">🎵 Music</span>
+        <button class="music-toggle" id="musicToggle" onclick="toggleMusic()"></button>
+        <input type="range" class="music-vol" id="musicVol" min="0" max="100" value="30" oninput="setMusicVol(this.value)">
+      </div>
       <div class="audio-row" style="flex-direction:column;align-items:flex-start;gap:8px;width:100%;">
         <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
           <span class="audio-label" style="font-size:11px;">⏱ Progress</span>
@@ -353,50 +358,16 @@ const GROUPS = [{"group": "Morning Affirmations", "icon": "🌅", "sessions": [{
 // ── R2 AUDIO ──────────────────────────────────────────────────────────────────
 var R2 = 'https://pub-50722e14177044aea768641dae886cce.r2.dev';
 var AUDIO_URLS = [
-  ['affirmations_audio/01_I_Am_More_Than_My_Diagnosis.mp3',
-   'affirmations_audio/02_My_Body_Is_Doing_Its_Best.mp3',
-   'affirmations_audio/03_Today_I_Choose_Courage.mp3',
-   'affirmations_audio/04_I_Am_A_Warrior_Not_A_Patient.mp3',
-   'affirmations_audio/05_This_Breath_This_Moment_This_Life.mp3'],
-  ['gratitude_audio/01_Three_Things_My_Body_Did_Today.mp3',
-   'gratitude_audio/02_I_Showed_Up_That_Is_Enough.mp3',
-   'gratitude_audio/03_Releasing_The_Fear_I_Carried_Today.mp3',
-   'gratitude_audio/04_Gratitude_For_The_People_Who_Held_Me.mp3',
-   'gratitude_audio/05_Gentle_Surrender_Into_Rest.mp3'],
-  ['breath_audio/01_Pursed_Lip_Breathing_Your_Anchor.mp3',
-   'breath_audio/02_Belly_Breathing_Slow_And_Gentle.mp3',
-   'breath_audio/03_Breath_As_Your_Home.mp3',
-   'breath_audio/04_The_Breathing_Body_Scan.mp3',
-   'breath_audio/05_Every_Exhale_Is_A_Release.mp3'],
-  ['anxiety_audio/01_Fear_Of_Hospital_Visits.mp3',
-   'anxiety_audio/02_Fear_Of_Breathlessness_In_Public.mp3',
-   'anxiety_audio/03_Fear_Of_Speaking_In_Meetings.mp3',
-   'anxiety_audio/04_Breaking_The_What_If_Loop.mp3',
-   'anxiety_audio/05_Fear_Of_Being_A_Burden.mp3',
-   'anxiety_audio/06_The_Oxygen_Alarm.mp3',
-   'anxiety_audio/07_When_They_Say_You_Look_Fine.mp3'],
-  ['overthinking_audio/01_The_Thought_Observer.mp3',
-   'overthinking_audio/02_Clouds_In_The_Sky_Thoughts_Pass.mp3',
-   'overthinking_audio/03_Body_Scan_To_Exit_The_Mind_Spiral.mp3',
-   'overthinking_audio/04_This_Thought_Is_Not_A_Fact.mp3',
-   'overthinking_audio/05_The_Quiet_Space_Between_Thoughts.mp3'],
-  ['motivation_audio/01_You_Came_This_Far.mp3',
-   'motivation_audio/02_Small_Victories_Are_Real_Victories.mp3',
-   'motivation_audio/03_Living_Fully_Not_Just_Surviving.mp3',
-   'motivation_audio/04_Your_Story_Is_Someone_Else_s_Strength.mp3',
-   'motivation_audio/05_The_Warrior_Who_Chose_Life_Today.mp3'],
+  ['affirmations_audio/01_I_Am_More_Than_My_Diagnosis.mp3','affirmations_audio/02_My_Body_Is_Doing_Its_Best.mp3','affirmations_audio/03_Today_I_Choose_Courage.mp3','affirmations_audio/04_I_Am_A_Warrior_Not_A_Patient.mp3','affirmations_audio/05_This_Breath_This_Moment_This_Life.mp3'],
+  ['gratitude_audio/01_Three_Things_My_Body_Did_Today.mp3','gratitude_audio/02_I_Showed_Up_That_Is_Enough.mp3','gratitude_audio/03_Releasing_The_Fear_I_Carried_Today.mp3','gratitude_audio/04_Gratitude_For_The_People_Who_Held_Me.mp3','gratitude_audio/05_Gentle_Surrender_Into_Rest.mp3'],
+  ['breath_audio/01_Pursed_Lip_Breathing_Your_Anchor.mp3','breath_audio/02_Belly_Breathing_Slow_And_Gentle.mp3','breath_audio/03_Breath_As_Your_Home.mp3','breath_audio/04_The_Breathing_Body_Scan.mp3','breath_audio/05_Every_Exhale_Is_A_Release.mp3'],
+  ['anxiety_audio/01_Fear_Of_Hospital_Visits.mp3','anxiety_audio/02_Fear_Of_Breathlessness_In_Public.mp3','anxiety_audio/03_Fear_Of_Speaking_In_Meetings.mp3','anxiety_audio/04_Breaking_The_What_If_Loop.mp3','anxiety_audio/05_Fear_Of_Being_A_Burden.mp3','anxiety_audio/06_The_Oxygen_Alarm.mp3','anxiety_audio/07_When_They_Say_You_Look_Fine.mp3'],
+  ['overthinking_audio/01_The_Thought_Observer.mp3','overthinking_audio/02_Clouds_In_The_Sky_Thoughts_Pass.mp3','overthinking_audio/03_Body_Scan_To_Exit_The_Mind_Spiral.mp3','overthinking_audio/04_This_Thought_Is_Not_A_Fact.mp3','overthinking_audio/05_The_Quiet_Space_Between_Thoughts.mp3'],
+  ['motivation_audio/01_You_Came_This_Far.mp3','motivation_audio/02_Small_Victories_Are_Real_Victories.mp3','motivation_audio/03_Living_Fully_Not_Just_Surviving.mp3','motivation_audio/04_Your_Story_Is_Someone_Else_s_Strength.mp3','motivation_audio/05_The_Warrior_Who_Chose_Life_Today.mp3'],
   [null,null,null,null,null],
   [null,null,null,null,null],
-  ['Advanced%20meditation_audio/01_Deep_Acceptance_This_Is_My_Life_And_It_Is_Beautiful.mp3',
-   'Advanced%20meditation_audio/02_Surrendering_The_Fear_Of_Tomorrow.mp3',
-   'Advanced%20meditation_audio/03_Finding_Meaning_Beyond_The_Illness.mp3',
-   'Advanced%20meditation_audio/04_Loving_Every_Part_Of_This_Body.mp3',
-   'Advanced%20meditation_audio/05_The_Warrior_Who_Chose_Life_Every_Single_Day.mp3'],
-  ['low_energy_audio/01_Just_One_Breath.mp3',
-   'low_energy_audio/02_Rest_Is_Enough.mp3',
-   'low_energy_audio/03_Hospital_Waiting_Room_Calm.mp3',
-   'low_energy_audio/04_I_Don_t_Need_To_Be_Productive_Today.mp3',
-   'low_energy_audio/05_Five_Minutes_Of_Peace.mp3'],
+  ['Advanced%20meditation_audio/01_Deep_Acceptance_This_Is_My_Life_And_It_Is_Beautiful.mp3','Advanced%20meditation_audio/02_Surrendering_The_Fear_Of_Tomorrow.mp3','Advanced%20meditation_audio/03_Finding_Meaning_Beyond_The_Illness.mp3','Advanced%20meditation_audio/04_Loving_Every_Part_Of_This_Body.mp3','Advanced%20meditation_audio/05_The_Warrior_Who_Chose_Life_Every_Single_Day.mp3'],
+  ['low_energy_audio/01_Just_One_Breath.mp3','low_energy_audio/02_Rest_Is_Enough.mp3','low_energy_audio/03_Hospital_Waiting_Room_Calm.mp3','low_energy_audio/04_I_Don_t_Need_To_Be_Productive_Today.mp3','low_energy_audio/05_Five_Minutes_Of_Peace.mp3'],
 ];
 function getAudioUrl(gi,si){
   if(!AUDIO_URLS[gi]||AUDIO_URLS[gi][si]==null)return null;
@@ -410,18 +381,12 @@ function getAudioEl(){
       if(!_audioEl.duration)return;
       var cur=Math.floor(_audioEl.currentTime),tot=Math.floor(_audioEl.duration);
       var m=Math.floor(cur/60),s=cur%60,mt=Math.floor(tot/60),st=tot%60;
-      var pt=document.getElementById('pTimer');
-      if(pt)pt.textContent=m+':'+(s<10?'0':'')+s;
-      var bar=document.getElementById('seekBar');
-      if(bar&&!bar._seeking)bar.value=Math.floor((_audioEl.currentTime/_audioEl.duration)*100);
-      var dur=document.getElementById('audioDuration');
-      if(dur)dur.textContent=mt+':'+(st<10?'0':'')+st;
+      var pt=document.getElementById('pTimer');if(pt)pt.textContent=m+':'+(s<10?'0':'')+s;
+      var bar=document.getElementById('seekBar');if(bar&&!bar._seeking)bar.value=Math.floor((_audioEl.currentTime/_audioEl.duration)*100);
+      var dur=document.getElementById('audioDuration');if(dur)dur.textContent=mt+':'+(st<10?'0':'')+st;
     });
     _audioEl.addEventListener('ended',finishSession);
-    _audioEl.addEventListener('canplay',function(){
-      var ct=document.getElementById('circleText');
-      if(ct&&ct.textContent==='...')ct.textContent='\u266a';
-    });
+    _audioEl.addEventListener('canplay',function(){var ct=document.getElementById('circleText');if(ct&&ct.textContent==='...')ct.textContent='\u266a';});
   }
   return _audioEl;
 }
@@ -451,85 +416,11 @@ var progress = load('phwm_progress', {done:{}, minutes:0, lastDay:'', streak:0, 
 var favs = load('phwm_favs', {});
 var reviews = load('phwm_reviews', {});
 
-// playback functions defined above
-
-
-
 function ssCancel(){var a=document.getElementById('sessAudio');if(a)a.pause();}
 function ssPause(){var a=document.getElementById('sessAudio');if(a)a.pause();}
-function ssResume(){var a=document.getElementById('sessAudio');if(a)a.play();}catch(e){} }
+function ssResume(){var a=document.getElementById('sessAudio');if(a)a.play();}
 
-// ── CUE PARSER — handles ALL cue label variants (BUG FIX for "b r e a t h e") ──
-function parseCue(p){
-  // returns {kind:'in'|'belly'|'pursed'|null, text}
-  var m = p.match(/^([A-Z_]+):\s*/);
-  if(!m) return {kind:null, text:p};
-  var label=m[1], rest=p.slice(m[0].length);
-  if(label==='BREATH_IN') return {kind:'in', text:rest};
-  if(label==='BREATH_PURSED_OUT') return {kind:'pursed', text:rest};
-  if(label==='BREATH_BELLY_OUT'||label==='BREATH_OUT') return {kind:'belly', text:rest};
-  // Unknown label — strip it anyway so TTS never spells it out
-  return {kind:null, text:rest};
-}
-
-function splitAtCommas(text){
-  var parts=text.split(/,\s*/), result=[], buffer='';
-  parts.forEach(function(part){
-    part=part.trim(); if(!part)return;
-    if(buffer){
-      if(buffer.split(/\s+/).length<3) buffer=buffer+' '+part;
-      else { result.push(buffer); buffer=part; }
-    } else buffer=part;
-  });
-  if(buffer)result.push(buffer);
-  return result;
-}
-function buildQueue(sess){
-  var q=[];
-  sess.paragraphs.forEach(function(p, pi){
-    if(pi < sess.introCount) return; // Skip intro completely
-    var isIntro = false;
-    var cue = parseCue(p);
-    var isIN = cue.kind==='in', isBO = cue.kind==='belly', isPO = cue.kind==='pursed';
-    var rate=isIN?0.60:(isPO||isBO)?0.50:0.68;
-    var pitch=isIN?0.88:(isPO||isBO)?0.80:0.93;
-    var parts=cue.text.split('...');
-    parts.forEach(function(part,pj){
-      part=part.trim(); if(!part)return;
-      var chunks=splitAtCommas(part);
-      chunks.forEach(function(chunk,ci){
-        chunk=chunk.trim(); if(!chunk)return;
-        q.push({type:'speak', text:chunk, rate:rate, pitch:pitch, intro:isIntro, breath:isIN?'in':(isBO||isPO)?'out':null});
-        if(ci<chunks.length-1)q.push({type:'pause', ms:COMMA_GAP, intro:isIntro});
-      });
-      if(pj<parts.length-1)q.push({type:'pause', ms:900, intro:isIntro});
-    });
-    if(isIN)q.push({type:'pause', ms:BREATH_IN_GAP, intro:isIntro});
-    else if(isBO)q.push({type:'pause', ms:BELLY_OUT_GAP, intro:isIntro});
-    else if(isPO)q.push({type:'pause', ms:PURSED_OUT_GAP, intro:isIntro});
-    else q.push({type:'pause', ms:PARA_GAP, intro:isIntro});
-    q.push({type:'pause', ms:SENT_GAP, intro:isIntro});
-  });
-  return q;
-}
-
-function speakNext(){
-  if(!isPlaying||isPaused)return;
-  if(speakIndex>=speakQueue.length){ finishSession(); return; }
-  var seg=speakQueue[speakIndex]; speakIndex++;
-  updateSkipIntroBtn();
-  if(seg.type==='pause'){
-    if(seg.ms>0)pauseTO=setTimeout(speakNext,seg.ms); else speakNext();
-  }else{
-    animateBreath(seg.breath);
-    var utt=new SpeechSynthesisUtterance(seg.text);
-    utt.rate=seg.rate||0.68; utt.pitch=seg.pitch||0.93; utt.volume=1;
-    var v=getVoice(); if(v)utt.voice=v;
-    utt.onend=function(){ if(isPlaying&&!isPaused)speakNext(); };
-    utt.onerror=function(){ if(isPlaying&&!isPaused)speakNext(); };
-    try{ window.speechSynthesis.speak(utt); }catch(e){ speakNext(); }
-  }
-}
+// speech synthesis queue removed
 function animateBreath(breath){
   var c=document.getElementById('breathCircle');
   var t=document.getElementById('circleText');
@@ -538,87 +429,68 @@ function animateBreath(breath){
   else if(breath==='out'){ c.className='breath-circle exhale'; if(t)t.textContent='breathe out'; }
   else { c.className='breath-circle'; if(t)t.textContent=''; }
 }
-function updateSkipIntroBtn(){
-  var btn=document.getElementById('skipIntroBtn'); if(!btn)return;
-  var inIntro = isPlaying && speakIndex<speakQueue.length && speakQueue[Math.max(0,speakIndex-1)] && speakQueue[Math.max(0,speakIndex-1)].intro;
-  btn.className = inIntro ? 'skip-intro show' : 'skip-intro';
-}
-function skipIntro(){
-  if(!speakQueue.length)return;
-  ssCancel(); clearTimeout(pauseTO);
-  var i=speakIndex;
-  while(i<speakQueue.length && speakQueue[i].intro) i++;
-  speakIndex=i;
-  document.getElementById('skipIntroBtn').className='skip-intro';
-  if(isPlaying&&!isPaused)speakNext();
-}
+function updateSkipIntroBtn(){}
+function skipIntro(){}
 
 function togglePlay(){
-  if(!window.speechSynthesis){ alert('Speech not supported in this browser'); return; }
   if(!isPlaying)startPlaying();
   else if(isPaused)resumePlaying();
   else pausePlaying();
 }
 function startPlaying(){
-  ssCancel();
-  var sess=GROUPS[curG].sessions[curS];
-  speakQueue=buildQueue(sess); speakIndex=0; elapsed=0;
-  isPlaying=true; isPaused=false;
+  var url=getAudioUrl(curG,curS);
+  var a=getAudioEl();
+  if(!url){
+    var ct=document.getElementById('circleText');
+    if(ct)ct.textContent='coming soon';
+    alert('Audio for this session is coming soon.');
+    return;
+  }
+  if(a.src!==url){a.src=url;a.currentTime=0;}
+  a.play();
+  isPlaying=true;isPaused=false;
   document.getElementById('playBtn').textContent='⏸';
-  startTimer(); requestWL();
-  progress.lastG=curG; progress.lastS=curS; store('phwm_progress',progress);
-  pauseTO=setTimeout(speakNext,600);
+  var ct=document.getElementById('circleText');if(ct)ct.textContent='...';
+  requestWL();
+  progress.lastG=curG;progress.lastS=curS;store('phwm_progress',progress);
 }
 function pausePlaying(){
-  isPaused=true; ssPause(); clearTimeout(pauseTO); clearInterval(timerInterval); releaseWL();
+  getAudioEl().pause();
+  isPaused=true;clearInterval(timerInterval);releaseWL();
   document.getElementById('playBtn').textContent='▶';
 }
 function resumePlaying(){
-  isPaused=false; ssResume(); requestWL();
+  getAudioEl().play();
+  isPaused=false;requestWL();
   document.getElementById('playBtn').textContent='⏸';
-  startTimer(); speakNext();
 }
 function stopSession(){
-  ssCancel(); clearTimeout(pauseTO); clearInterval(timerInterval); releaseWL();
-  isPlaying=false; isPaused=false; elapsed=0; speakIndex=0; speakQueue=[];
-  var pb=document.getElementById('playBtn'); if(pb)pb.textContent='▶';
-  var pt=document.getElementById('pTimer'); if(pt)pt.textContent='0:00';
-  var sk=document.getElementById('skipIntroBtn'); if(sk)sk.className='skip-intro';
+  var a=document.getElementById('sessAudio');
+  if(a){a.pause();a.removeAttribute('src');a.load();}
+  isPlaying=false;isPaused=false;elapsed=0;
+  clearInterval(timerInterval);releaseWL();
+  var pb=document.getElementById('playBtn');if(pb)pb.textContent='▶';
+  var pt=document.getElementById('pTimer');if(pt)pt.textContent='0:00';
+  var bar=document.getElementById('seekBar');if(bar)bar.value=0;
+  var dur=document.getElementById('audioDuration');if(dur)dur.textContent='';
   animateBreath(null);
-  var t=document.getElementById('circleText'); if(t)t.textContent='ready';
+  var t=document.getElementById('circleText');if(t)t.textContent='ready';
 }
 function finishSession(){
-  markDone(); stopSession();
-  var t=document.getElementById('circleText'); if(t)t.textContent='complete 🙏';
+  markDone();stopSession();
+  var t=document.getElementById('circleText');if(t)t.textContent='complete 🙏';
   var cb=document.getElementById('autoNextCheck');
-  if(cb&&cb.checked){ setTimeout(function(){ if(!isPlaying)nextSessionAuto(); },1500); }
+  if(cb&&cb.checked){setTimeout(function(){if(!isPlaying)nextSessionAuto();},1500);}
 }
-function replaySession(){ stopSession(); startPlaying(); }
-function skipForward(){
-  if(!speakQueue.length)return;
-  ssCancel(); clearTimeout(pauseTO);
-  speakIndex=Math.min(speakQueue.length-1, speakIndex+3); elapsed+=10;
-  if(isPlaying&&!isPaused)speakNext();
-}
-function skipBack(){
-  if(!speakQueue.length)return;
-  ssCancel(); clearTimeout(pauseTO);
-  speakIndex=Math.max(0, speakIndex-3); elapsed=Math.max(0,elapsed-10);
-  if(isPlaying&&!isPaused)speakNext();
-}
+function replaySession(){var a=getAudioEl();a.currentTime=0;a.play();isPlaying=true;isPaused=false;document.getElementById('playBtn').textContent='⏸';}
+function skipForward(){var a=getAudioEl();if(a.readyState)a.currentTime=Math.min(a.duration||0,a.currentTime+10);}
+function skipBack(){var a=getAudioEl();if(a.readyState)a.currentTime=Math.max(0,a.currentTime-10);}
 function prevSession(){ if(curS>0){ stopSession(); openPlayer(curG,curS-1);} }
 function nextSessionBtn(){ if(curS<GROUPS[curG].sessions.length-1){ stopSession(); openPlayer(curG,curS+1);} }
 function nextSessionAuto(){
   if(curS<GROUPS[curG].sessions.length-1){ openPlayer(curG,curS+1); startPlaying(); }
 }
-function startTimer(){
-  clearInterval(timerInterval);
-  timerInterval=setInterval(function(){
-    elapsed++;
-    var m=Math.floor(elapsed/60), s=elapsed%60;
-    var pt=document.getElementById('pTimer'); if(pt)pt.textContent=m+':'+(s<10?'0':'')+s;
-  },1000);
-}
+function startTimer(){}  // driven by audio timeupdate
 function requestWL(){
   try{ if('wakeLock' in navigator){ navigator.wakeLock.request('screen').then(function(wl){wakeLock=wl;}).catch(function(){}); } }catch(e){}
 }
