@@ -420,6 +420,27 @@ function ssCancel(){var a=document.getElementById('sessAudio');if(a)a.pause();}
 function ssPause(){var a=document.getElementById('sessAudio');if(a)a.pause();}
 function ssResume(){var a=document.getElementById('sessAudio');if(a)a.play();}
 
+function parseCue(p){
+  var m = p.match(/^([A-Z_]+):\s*/);
+  if(!m) return {kind:null, text:p};
+  var label=m[1], rest=p.slice(m[0].length);
+  if(label==='BREATH_IN') return {kind:'in', text:rest};
+  if(label==='BREATH_PURSED_OUT') return {kind:'pursed', text:rest};
+  if(label==='BREATH_BELLY_OUT'||label==='BREATH_OUT') return {kind:'belly', text:rest};
+  return {kind:null, text:rest};
+}
+function splitAtCommas(text){
+  var parts=text.split(/,\s*/), result=[], buffer='';
+  parts.forEach(function(part){
+    part=part.trim(); if(!part)return;
+    if(buffer){
+      if(buffer.split(/\s+/).length<3) buffer=buffer+' '+part;
+      else { result.push(buffer); buffer=part; }
+    } else buffer=part;
+  });
+  if(buffer)result.push(buffer);
+  return result;
+}
 // speech synthesis queue removed
 function animateBreath(breath){
   var c=document.getElementById('breathCircle');
