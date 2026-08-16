@@ -63,13 +63,15 @@
   .grid { display:grid; grid-template-columns:1fr 1fr; gap:13px; margin:0 18px; }
   .tile {
     border-radius:24px; padding:18px 15px 15px; cursor:pointer; position:relative; overflow:hidden;
-    border:1px solid rgba(255,255,255,.12); min-height:132px;
+    border:1px solid rgba(255,255,255,.10); min-height:132px;
     display:flex; flex-direction:column; justify-content:flex-end;
-    transition:transform .15s;
+    transition:transform .15s, box-shadow .15s;
+    backdrop-filter:blur(12px);
   }
+  .tile:hover { border-color:rgba(255,255,255,.18); }
   .tile:active { transform:scale(.97); }
-  .tile-emoji { font-size:37px; position:absolute; top:14px; left:15px; filter:drop-shadow(0 4px 8px rgba(0,0,0,.3)); }
-  .tile-name { font-size:14px; font-weight:700; line-height:1.3; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,.35); }
+  .tile-emoji { font-size:40px; position:absolute; top:14px; left:15px; filter:drop-shadow(0 4px 12px rgba(0,0,0,.5)); }
+  .tile-name { font-size:13.5px; font-weight:700; line-height:1.3; color:#F0EDFA; letter-spacing:0.2px; }
   .tile-count { font-size:11px; color:rgba(255,255,255,.85); margin-top:3px; }
 
   /* SOS */
@@ -262,7 +264,7 @@
     <button class="back-btn" onclick="exitPlayer()">‹</button>
     <div class="topbar-title" style="font-size:13px;color:#8B87A8;font-weight:600;">NOW PLAYING</div>
   </div>
-  <div class="ptabs">
+  <div class="ptabs" style="display:none;">
     <div class="ptab on" id="tabPlay" onclick="pTab('play')">Player</div>
     <div class="ptab" id="tabScript" onclick="pTab('script')">Script</div>
     <div class="ptab" id="tabReview" onclick="pTab('review')">Review</div>
@@ -706,7 +708,7 @@ function renderHome(){
   document.getElementById('heroTitle').textContent=GROUPS[hg].sessions[hs].title;
   document.getElementById('heroSub').textContent=GROUPS[hg].icon+' '+GROUPS[hg].group+' · '+GROUPS[hg].sessions[hs].duration;
   document.getElementById('groupGrid').innerHTML=GROUPS.map(function(g,gi){
-    return '<div class="tile" style="background:linear-gradient(150deg,'+g.c1+'CC,'+g.c2+'E6);" onclick="openGroup('+gi+')">'+
+    return '<div class="tile" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);box-shadow:inset 0 0 40px '+g.c1+'18,0 4px 20px rgba(0,0,0,0.3);" onclick="openGroup('+gi+')">'+
       '<div class="tile-emoji">'+g.icon+'</div>'+
       '<div><div class="tile-name">'+g.group+'</div>'+
       '<div class="tile-count">'+g.sessions.length+' sessions</div></div></div>';
