@@ -103,6 +103,8 @@
 
   /* ── TILE SVG ICONS ── */
   .tile-emoji { display:none; }
+  .tile-soon-wrap { display:contents; }
+  .tile-soon-wrap-cs { display:contents; }
   .tile-svg { position:absolute; top:13px; left:13px; width:44px; height:44px; }
   .tile-soon-badge { position:absolute; top:9px; right:10px; font-size:9px; color:#F5C97B; letter-spacing:1px; text-transform:uppercase; background:rgba(245,201,123,0.12); border:1px solid rgba(245,201,123,0.28); padding:2px 8px; border-radius:20px; font-family:system-ui,sans-serif; }
   .tile-soon { opacity:0.65; pointer-events:none; }
@@ -1050,18 +1052,20 @@ function renderHome(){
   if(progress.lastG!==null&&GROUPS[progress.lastG]){
     hg=progress.lastG; hs=progress.lastS||0; label='Continue where you left off';
   } else {
-    hg=day%GROUPS.length; hs=day%GROUPS[hg].sessions.length; label="Today's Session";
+    var _avail=GROUPS.filter(function(g){return g.sessions&&g.sessions.length>0;});
+    var _g=_avail[day%_avail.length];
+    hg=GROUPS.indexOf(_g); hs=day%_g.sessions.length; label="Today\'s Session";
   }
   document.getElementById('heroLabel').textContent=label;
   document.getElementById('heroTitle').textContent=GROUPS[hg].sessions[hs].title;
   document.getElementById('heroSub').textContent=GROUPS[hg].icon+' '+GROUPS[hg].group+' · '+GROUPS[hg].sessions[hs].duration;
   document.getElementById('groupGrid').innerHTML=GROUPS.map(function(g,gi){
     return var _cs=g.comingSoon;
-    return '<div class="tile-soon-wrap'+(g.comingSoon?' tile-soon-wrap-cs':'')+'">'+'<div class="tile'+(g.comingSoon?' tile-soon':'')+'" style="background:linear-gradient(145deg,'+g.c1+'28,'+g.c2+'40);border:1px solid '+g.c1+'45;box-shadow:0 8px 24px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.1);" onclick="'+(_cs?'showToast()':'openGroup('+gi+')')+'">'+
+    return '<div class="tile'+(g.comingSoon?' tile-soon':'')+'" style="background:linear-gradient(145deg,'+g.c1+'28,'+g.c2+'40);border:1px solid '+g.c1+'45;box-shadow:0 8px 24px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.1);" onclick="'+(_cs?'showToast()':'openGroup('+gi+')')+'">'+
       (TILE_ICONS[gi]?'<div class="tile-svg">'+TILE_ICONS[gi]+'</div>':'<div class="tile-emoji">'+g.icon+'</div>')+
       (_cs?'<div class="tile-soon-badge">Coming soon</div>':'')+
       '<div><div class="tile-name">'+g.group+'</div>'+
-      '<div class="tile-count">'+(_cs?'':g.sessions.length+' sessions')+'</div></div></div></div>';
+      '<div class="tile-count">'+(_cs?'':g.sessions.length+' sessions')+'</div></div></div>';
   }).join('');
   updateStats();
 }
