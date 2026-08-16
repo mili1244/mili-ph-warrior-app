@@ -62,13 +62,12 @@
   .sec-title { margin:26px 22px 12px; font-size:12.5px; letter-spacing:2.5px; color:#8B87A8; text-transform:uppercase; font-weight:600; }
   .grid { display:grid; grid-template-columns:1fr 1fr; gap:13px; margin:0 18px; }
   .tile {
-    border-radius:24px; padding:18px 15px 15px; cursor:pointer; position:relative; overflow:hidden;
-    border:1px solid rgba(255,255,255,.10); min-height:132px;
-    display:flex; flex-direction:column; justify-content:flex-end;
-    transition:transform .15s, box-shadow .15s;
-    backdrop-filter:blur(12px);
+    border-radius:22px; padding:18px 15px 14px; cursor:pointer; position:relative; overflow:hidden;
+    min-height:130px; display:flex; flex-direction:column; justify-content:flex-end;
+    transition:transform .18s ease, box-shadow .18s ease;
+    backdrop-filter:blur(16px);
   }
-  .tile:hover { border-color:rgba(255,255,255,.18); }
+  .tile:active { transform:scale(0.97); }
   .tile:active { transform:scale(.97); }
   .tile-emoji { font-size:40px; position:absolute; top:14px; left:15px; filter:drop-shadow(0 4px 12px rgba(0,0,0,.5)); }
   .tile-name { font-size:13.5px; font-weight:700; line-height:1.3; color:#F0EDFA; letter-spacing:0.2px; }
@@ -85,6 +84,21 @@
   }
   @keyframes sosPulse { 0%,100%{box-shadow:0 8px 26px rgba(229,72,77,.45);} 50%{box-shadow:0 8px 38px rgba(229,72,77,.8);} }
 
+
+  /* ── JOURNEY HISTORY ── */
+  .j-wrap { padding:0 16px 100px; }
+  .j-big { text-align:center; padding:22px 0 16px; }
+  .j-big-n { font-size:56px; font-weight:800; background:linear-gradient(90deg,#F5C97B,#F9A8C9); -webkit-background-clip:text; background-clip:text; color:transparent; line-height:1; }
+  .j-big-l { font-size:13px; color:#8B87A8; letter-spacing:1px; text-transform:uppercase; margin-top:4px; }
+  .j-date-label { font-size:11px; font-weight:700; color:#8B87A8; letter-spacing:1.5px; text-transform:uppercase; padding:8px 0 6px; }
+  .j-hist-item { display:flex; align-items:center; gap:14px; padding:14px 16px; margin-bottom:8px; border-radius:18px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); cursor:pointer; transition:background .15s; }
+  .j-hist-item:active { background:rgba(255,255,255,.09); }
+  .j-hist-icon { font-size:28px; flex-shrink:0; width:44px; height:44px; background:rgba(255,255,255,.07); border-radius:14px; display:flex; align-items:center; justify-content:center; }
+  .j-hist-info { flex:1; min-width:0; }
+  .j-hist-title { font-size:14px; font-weight:600; color:#F0EDFA; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .j-hist-sub { font-size:11.5px; color:#8B87A8; margin-top:2px; }
+  .j-hist-replay { color:#8B87A8; font-size:13px; flex-shrink:0; }
+  .fav-empty { text-align:center; color:#6E6890; font-size:14px; padding:20px 0 10px; }
   /* GROUP VIEW */
   .topbar { display:flex; align-items:center; gap:13px; padding:22px 18px 12px; }
   .back-btn { background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.1); color:#F0EDFA; width:40px;height:40px; border-radius:14px; font-size:18px; cursor:pointer; }
@@ -359,12 +373,13 @@
   <div class="topbar"><div class="topbar-title">My Journey</div></div>
   <div class="j-wrap">
     <div class="j-big"><div class="j-big-n" id="jSessions">0</div><div class="j-big-l">Sessions completed</div></div>
-    <div class="stats-row" style="margin:0 0 18px;">
-      <div class="stat"><div class="stat-n" id="jStreak">0</div><div class="stat-l">Day streak</div></div>
+    <div class="stats-row" style="margin:0 0 24px;">
+      <div class="stat"><div class="stat-n" id="jStreak">0</div><div class="stat-l">Day streak 🔥</div></div>
       <div class="stat"><div class="stat-n" id="jMinutes">0</div><div class="stat-l">Total minutes</div></div>
-      <div class="stat"><div class="stat-n" id="jReviewed">0</div><div class="stat-l">Reviewed</div></div>
     </div>
-    <div class="sec-title" style="margin:6px 4px 12px;">♥ Favourites</div>
+    <div class="sec-title" style="margin:0 4px 12px;">📖 Session History</div>
+    <div id="histList"></div>
+    <div class="sec-title" style="margin:20px 4px 12px;">♥ Favourites</div>
     <div id="favList"></div>
   </div>
 </div>
@@ -450,34 +465,10 @@ function startBreathCycle() {
   stopBreathCycle();
   var c = document.getElementById('breathCircle');
   var t = document.getElementById('circleText');
-  if (curG === 2) {
-    // Breath Awareness group: show inhale/exhale cues
-    _breathPhase = 0;
-    _runBreath();
-    _breathTimer = setInterval(_runBreath, 5500);
-  } else {
-    // All other groups: gentle ambient pulse only, no text cues
-    if (c) c.className = 'breath-circle ambient';
-    if (t) t.textContent = '♪';
-  }
+  if (c) c.className = 'breath-circle ambient';
+  if (t) t.textContent = '♪';
 }
-function _runBreath() {
-  if (!isPlaying || isPaused) return;
-  var c = document.getElementById('breathCircle');
-  var t = document.getElementById('circleText');
-  if (!c) return;
-  if (_breathPhase === 0) {
-    c.className = 'breath-circle inhale';
-    if (t) t.textContent = 'breathe in';
-  } else if (_breathPhase === 1) {
-    c.className = 'breath-circle';
-    if (t) t.textContent = '♪';
-  } else {
-    c.className = 'breath-circle exhale';
-    if (t) t.textContent = 'breathe out';
-  }
-  _breathPhase = (_breathPhase + 1) % 3;
-}
+function _runBreath() {}
 function stopBreathCycle() {
   if (_breathTimer) { clearInterval(_breathTimer); _breathTimer = null; }
   var c = document.getElementById('breathCircle');
@@ -506,7 +497,7 @@ var voiceCache=null, wakeLock=null;
 
 function store(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }
 function load(k,d){ try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;} }
-var progress = load('phwm_progress', {done:{}, minutes:0, lastDay:'', streak:0, lastG:null, lastS:null});
+var progress = load('phwm_progress', {done:{}, minutes:0, lastDay:'', streak:0, lastG:null, lastS:null, history:[]});
 var favs = load('phwm_favs', {});
 var reviews = load('phwm_reviews', {});
 
@@ -631,11 +622,10 @@ function markDone(){
   updateStats();
 }
 function updateStats(){
-  var n=Object.keys(progress.done).length;
+  var n=(progress.history||[]).length;
   ['statSessions','jSessions'].forEach(function(id){var e=document.getElementById(id);if(e)e.textContent=n;});
-  ['statStreak','jStreak'].forEach(function(id){var e=document.getElementById(id);if(e)e.textContent=progress.streak;});
-  ['statMinutes','jMinutes'].forEach(function(id){var e=document.getElementById(id);if(e)e.textContent=progress.minutes;});
-  var jr=document.getElementById('jReviewed'); if(jr)jr.textContent=Object.keys(reviews).length;
+  ['statStreak','jStreak'].forEach(function(id){var e=document.getElementById(id);if(e)e.textContent=progress.streak||0;});
+  ['statMinutes','jMinutes'].forEach(function(id){var e=document.getElementById(id);if(e)e.textContent=progress.minutes||0;});
 }
 
 // ── NAV / RENDER ──
@@ -772,20 +762,82 @@ function exportAll(){
 }
 
 // ── JOURNEY ──
+function onSessionEnded(){
+  var g=GROUPS[curG], s=g.sessions[curS];
+  var dur=parseInt((s.duration||'0').replace(/[^0-9]/g,''))||10;
+  var today=new Date().toISOString().slice(0,10);
+  // streak
+  var yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  if(progress.lastDay===today){/* same day, no change */}
+  else if(progress.lastDay===yesterday){progress.streak=(progress.streak||0)+1;}
+  else{progress.streak=1;}
+  progress.lastDay=today;
+  // done map
+  var key=curG+'-'+curS;
+  progress.done[key]=(progress.done[key]||0)+1;
+  progress.minutes=(progress.minutes||0)+dur;
+  // history log (keep last 100)
+  if(!progress.history) progress.history=[];
+  progress.history.unshift({g:curG,s:curS,title:s.title,group:g.group,icon:g.icon,date:today,min:dur});
+  if(progress.history.length>100) progress.history.pop();
+  store('phwm_progress',progress);
+  // update home stats
+  document.getElementById('statSessions').textContent=Object.values(progress.done).reduce(function(a,b){return a+b;},0);
+  document.getElementById('statMinutes').textContent=progress.minutes;
+  // show completion pulse on circle
+  var c=document.getElementById('breathCircle');
+  if(c){c.className='breath-circle inhale';setTimeout(function(){if(c)c.className='breath-circle ambient';},2000);}
+}
 function renderJourney(){
   updateStats();
+  // History log
+  var hist=progress.history||[];
+  var histHtml='';
+  if(hist.length===0){
+    histHtml='<div class="fav-empty" style="margin-bottom:32px;">Your completed sessions will appear here</div>';
+  } else {
+    var grouped={};
+    hist.forEach(function(h){
+      if(!grouped[h.date]) grouped[h.date]=[];
+      grouped[h.date].push(h);
+    });
+    var dates=Object.keys(grouped).sort().reverse();
+    dates.forEach(function(date){
+      var d=new Date(date); var label=formatDate(d);
+      histHtml+='<div class="j-date-label">'+label+'</div>';
+      grouped[date].forEach(function(h){
+        histHtml+='<div class="j-hist-item" onclick="openPlayer('+h.g+','+h.s+')">'+
+          '<div class="j-hist-icon">'+h.icon+'</div>'+
+          '<div class="j-hist-info">'+
+            '<div class="j-hist-title">'+h.title+'</div>'+
+            '<div class="j-hist-sub">'+h.group+' · '+h.min+' min</div>'+
+          '</div>'+
+          '<div class="j-hist-replay">▶</div>'+
+        '</div>';
+      });
+    });
+  }
+  document.getElementById('histList').innerHTML=histHtml;
+  // Favourites
   var list=[];
   GROUPS.forEach(function(g,gi){
     g.sessions.forEach(function(s,si){
       if(favs[gi+'-'+si]){
-        list.push('<div class="sess-item" onclick="openPlayer('+gi+','+si+')">'+
-          '<div class="sess-num" style="background:linear-gradient(135deg,'+g.c1+','+g.c2+');">'+g.icon+'</div>'+
-          '<div class="sess-info"><div class="sess-name">'+s.title+'</div>'+
-          '<div class="sess-meta">'+g.group+'</div></div></div>');
+        list.push('<div class="j-hist-item" onclick="openPlayer('+gi+','+si+')">'+
+          '<div class="j-hist-icon">'+g.icon+'</div>'+
+          '<div class="j-hist-info"><div class="j-hist-title">'+s.title+'</div>'+
+          '<div class="j-hist-sub">'+g.group+'</div></div>'+
+          '<div class="j-hist-replay">▶</div></div>');
       }
     });
   });
   document.getElementById('favList').innerHTML=list.length?list.join(''):'<div class="fav-empty">Tap ♥ on any session to save it here</div>';
+}
+function formatDate(d){
+  var today=new Date(); var yest=new Date(Date.now()-86400000);
+  if(d.toDateString()===today.toDateString()) return 'Today';
+  if(d.toDateString()===yest.toDateString()) return 'Yesterday';
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
 }
 
 // ── HOME ──
@@ -805,7 +857,7 @@ function renderHome(){
   document.getElementById('heroTitle').textContent=GROUPS[hg].sessions[hs].title;
   document.getElementById('heroSub').textContent=GROUPS[hg].icon+' '+GROUPS[hg].group+' · '+GROUPS[hg].sessions[hs].duration;
   document.getElementById('groupGrid').innerHTML=GROUPS.map(function(g,gi){
-    return '<div class="tile" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);box-shadow:inset 0 0 40px '+g.c1+'18,0 4px 20px rgba(0,0,0,0.3);" onclick="openGroup('+gi+')">'+
+    return '<div class="tile" style="background:linear-gradient(145deg,'+g.c1+'28,'+g.c2+'40);border:1px solid '+g.c1+'45;box-shadow:0 8px 24px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.1);" onclick="openGroup('+gi+')">'+
       '<div class="tile-emoji">'+g.icon+'</div>'+
       '<div><div class="tile-name">'+g.group+'</div>'+
       '<div class="tile-count">'+g.sessions.length+' sessions</div></div></div>';
@@ -903,6 +955,6 @@ function init(){
 }
 init();
 </script>
-<audio id="sessAudio" preload="auto"></audio>
+<audio id="sessAudio" preload="auto" onended="onSessionEnded()"></audio>
 </body>
 </html>
