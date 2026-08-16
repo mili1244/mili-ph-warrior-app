@@ -686,7 +686,7 @@ function navTo(id){
   showView(id);
 }
 function heroTap(){
-  if(progress.lastG!==null&&GROUPS[progress.lastG]){ openPlayer(progress.lastG, progress.lastS||0); }
+  if(progress.lastG!==null&&GROUPS[progress.lastG]&&GROUPS[progress.lastG].sessions&&GROUPS[progress.lastG].sessions.length>0){ openPlayer(progress.lastG, progress.lastS||0); }
   else { openPlayer(0,0); }
 }
 
@@ -846,6 +846,45 @@ function toggleFav(ev,gi,si){
   store('phwm_favs',favs);
   openGroup(gi);
 }
+var WARMTH = [
+  'That was real. Well done.',
+  'You showed up today. That matters.',
+  'Every session is a gift to yourself.',
+  'Rest now. You earned it.',
+  'Breathing through difficulty is strength.',
+  'You are doing something remarkable.'
+];
+var _compTimer = null;
+
+function showCompletion(){
+  var ov = document.getElementById('completionOverlay');
+  var g = GROUPS[curG], s = g.sessions[curS];
+  document.getElementById('compTitle').textContent = s.title;
+  document.getElementById('compWarmth').textContent = WARMTH[Math.floor(Math.random()*WARMTH.length)];
+  document.getElementById('compStreak').textContent = (progress.streak||0)+'🔥';
+  document.getElementById('compSessions').textContent = (progress.history||[]).length;
+  // reset check animation
+  var chk = document.getElementById('compCheck');
+  chk.style.animation='none'; chk.style.opacity='0';
+  setTimeout(function(){chk.style.animation='checkPop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards';},50);
+  ov.style.display='flex';
+  clearTimeout(_compTimer);
+  _compTimer = setTimeout(closeCompletion, 8000);
+}
+function closeCompletion(){
+  clearTimeout(_compTimer);
+  document.getElementById('completionOverlay').style.display='none';
+  navTo('viewHome');
+}
+function compNext(){
+  clearTimeout(_compTimer);
+  document.getElementById('completionOverlay').style.display='none';
+  var g = GROUPS[curG];
+  var nextS = (curS+1) < g.sessions.length ? curS+1 : 0;
+  openPlayer(curG, nextS);
+}
+
+
 function openPlayer(gi,si){
   stopSession();
   curG=gi; curS=si;
@@ -855,45 +894,6 @@ function openPlayer(gi,si){
   renderScript(); loadRev();
   pTab('play');
   var sf=document.querySelector('.sos-fab'); if(sf)sf.style.display='none';
-  
-  var WARMTH = [
-    'That was real. Well done.',
-    'You showed up today. That matters.',
-    'Every session is a gift to yourself.',
-    'Rest now. You earned it.',
-    'Breathing through difficulty is strength.',
-    'You are doing something remarkable.'
-  ];
-  var _compTimer = null;
-  
-  function showCompletion(){
-    var ov = document.getElementById('completionOverlay');
-    var g = GROUPS[curG], s = g.sessions[curS];
-    document.getElementById('compTitle').textContent = s.title;
-    document.getElementById('compWarmth').textContent = WARMTH[Math.floor(Math.random()*WARMTH.length)];
-    document.getElementById('compStreak').textContent = (progress.streak||0)+'🔥';
-    document.getElementById('compSessions').textContent = (progress.history||[]).length;
-    // reset check animation
-    var chk = document.getElementById('compCheck');
-    chk.style.animation='none'; chk.style.opacity='0';
-    setTimeout(function(){chk.style.animation='checkPop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards';},50);
-    ov.style.display='flex';
-    clearTimeout(_compTimer);
-    _compTimer = setTimeout(closeCompletion, 8000);
-  }
-  function closeCompletion(){
-    clearTimeout(_compTimer);
-    document.getElementById('completionOverlay').style.display='none';
-    navTo('viewHome');
-  }
-  function compNext(){
-    clearTimeout(_compTimer);
-    document.getElementById('completionOverlay').style.display='none';
-    var g = GROUPS[curG];
-    var nextS = (curS+1) < g.sessions.length ? curS+1 : 0;
-    openPlayer(curG, nextS);
-  }
-  
   showView('viewPlayer');
 }
 function exitPlayer(){ stopSession(); openGroup(curG); var sf=document.querySelector('.sos-fab'); if(sf)sf.style.display=''; }
@@ -1049,7 +1049,7 @@ function renderHome(){
   var day=Math.floor(Date.now()/86400000);
   document.getElementById('dailyQuote').textContent='"'+QUOTES[day%QUOTES.length]+'"';
   var hg,hs,label;
-  if(progress.lastG!==null&&GROUPS[progress.lastG]){
+  if(progress.lastG!==null&&GROUPS[progress.lastG]&&GROUPS[progress.lastG].sessions&&GROUPS[progress.lastG].sessions.length>0){
     hg=progress.lastG; hs=progress.lastS||0; label='Continue where you left off';
   } else {
     var _avail=GROUPS.filter(function(g){return g.sessions&&g.sessions.length>0;});
@@ -1060,12 +1060,12 @@ function renderHome(){
   document.getElementById('heroTitle').textContent=GROUPS[hg].sessions[hs].title;
   document.getElementById('heroSub').textContent=GROUPS[hg].icon+' '+GROUPS[hg].group+' · '+GROUPS[hg].sessions[hs].duration;
   document.getElementById('groupGrid').innerHTML=GROUPS.map(function(g,gi){
-    return var _cs=g.comingSoon;
-    return '<div class="tile'+(g.comingSoon?' tile-soon':'')+'" style="background:linear-gradient(145deg,'+g.c1+'28,'+g.c2+'40);border:1px solid '+g.c1+'45;box-shadow:0 8px 24px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.1);" onclick="'+(_cs?'showToast()':'openGroup('+gi+')')+'">'+
-      (TILE_ICONS[gi]?'<div class="tile-svg">'+TILE_ICONS[gi]+'</div>':'<div class="tile-emoji">'+g.icon+'</div>')+
-      (_cs?'<div class="tile-soon-badge">Coming soon</div>':'')+
-      '<div><div class="tile-name">'+g.group+'</div>'+
-      '<div class="tile-count">'+(_cs?'':g.sessions.length+' sessions')+'</div></div></div>';
+    var _cs=g.comingSoon;
+    return '<div class="tile'+(g.comingSoon?' tile-soon':'')+'" style="background:linear-gradient(145deg,'+g.c1+'28,'+g.c2+'40);border:1px solid '+g.c1+'45;box-shadow:0 8px 24px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.1);" onclick="'+(_cs?'showToast()':'openGroup('+gi+')')+'">'
+      +(TILE_ICONS[gi]?'<div class="tile-svg">'+TILE_ICONS[gi]+'</div>':'<div class="tile-emoji">'+g.icon+'</div>')
+      +(_cs?'<div class="tile-soon-badge">Coming soon</div>':'')
+      +'<div><div class="tile-name">'+g.group+'</div>'
+      +'<div class="tile-count">'+(_cs?'':g.sessions.length+' sessions')+'</div></div></div>';
   }).join('');
   updateStats();
 }
